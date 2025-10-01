@@ -1,0 +1,13 @@
+name: kafka-cart
+
+services:
+  kafka:
+    container_name: kafka
+    image: apache/kafka:latest
+    ports:
+      - "9092:9092"
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"

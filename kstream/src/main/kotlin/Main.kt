@@ -20,7 +20,7 @@ fun main() {
         put(StreamsConfig.APPLICATION_ID_CONFIG, "redis-aggregator")
         put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
         put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde::class.java.name)
-        put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.StringSerde::class.java.name)
+        put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, EventSerde::class.java.name)
         put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
     }
 
@@ -34,17 +34,17 @@ fun main() {
     val builder = StreamsBuilder()
 
     builder
-        .stream<String, String>("product")
+        .stream<String, Event>("product")
         // would be nice to not have to map here and instead configure a custom serializer in `props`
-        .mapValues { value ->
-            println("value: $value")
-            try {
-                Json.decodeFromString<Event>(value)
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                null // throw away undecodable messages
-            }
-        }
+        //.mapValues { value ->
+        //    println("value: $value")
+        //    try {
+        //        Json.decodeFromString<Event>(value)
+        //    } catch (t: Throwable) {
+        //        t.printStackTrace()
+        //        null // throw away undecodable messages
+        //    }
+        //}
         .filter { _, value -> value is ProductAddedToCart || value is ProductRemovedFromCart }
         .foreach { _, value ->
             val productId: ProductId = when (value!!::class) {

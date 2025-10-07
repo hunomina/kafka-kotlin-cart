@@ -16,13 +16,7 @@ const val redisNamespaceTotal = "product:in-cart:count-total"
 const val redisNamespaceUnique = "product:in-cart:count-unique"
 
 fun main() {
-    val props = Properties().apply {
-        put(StreamsConfig.APPLICATION_ID_CONFIG, "redis-aggregator")
-        put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
-        put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde::class.java.name)
-        put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, EventSerde::class.java.name)
-        put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-    }
+
 
     val redisClient = RedisClient.create("redis://127.0.0.1:6379")
     val redisConnection = redisClient.connect()
@@ -65,6 +59,22 @@ fun main() {
 
             dumpRedis(redis)
         }
+
+    val props = Properties().apply {
+        put(StreamsConfig.APPLICATION_ID_CONFIG, "redis-aggregator")
+        put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+        put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde::class.java.name)
+        put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, EventSerde::class.java.name)
+        put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+        put(
+            StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
+            CustomDeserializationExceptionHandler::class.java
+        )
+        put(
+            StreamsConfig.DEFAULT_PRODUCTION_EXCEPTION_HANDLER_CLASS_CONFIG,
+            CustomProductionExceptionHandler::class.java
+        )
+    }
 
     val streams = KafkaStreams(builder.build(), props)
 

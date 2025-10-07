@@ -29,5 +29,4 @@ kafka/delete-product-topic:
 	/opt/kafka/bin/kafka-topics.sh \
 		--bootstrap-server localhost:9092 \
 		--delete \
-		--topic product \
-		--force
+		--topic product

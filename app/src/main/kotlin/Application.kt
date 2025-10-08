@@ -65,4 +65,9 @@ fun Application.module() {
             call.respondText("Message sent", status = HttpStatusCode.OK)
         }
     }
+
+    monitor.subscribe(ProductCreatedEventDefinition) { event ->
+        println("Product created event received")
+        println(event)
+    }
 }

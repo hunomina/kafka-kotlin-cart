@@ -41,3 +41,7 @@ val KafkaPlugin = createApplicationPlugin(name = "KafkaPlugin") {
         consumer.close()
     }
 }
+
+enum class Topic {
+    PRODUCT
+}

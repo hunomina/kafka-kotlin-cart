@@ -27,39 +27,41 @@ fun Application.module() {
         }
 
         fun RoutingContext.publishToKafka(
-            topic: String,
+            topic: Topic,
             key: String?,
             event: Event,
         ) {
             call.application.attributes[ProducerKey]
-                .sendMessage(topic, key, Json.encodeToString(event))
+                .sendMessage(topic.toString().lowercase(), key, Json.encodeToString(event))
         }
 
-        post("/products") {
-            val productInput: CreateProductInput
-            try {
-                productInput = call.receive<CreateProductInput>()
-            } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    "${e::class} - Invalid request payload: ${e.message}, ${e.printStackTrace()}"
-                )
-                return@post
+        route("/api") {
+            post("/products") {
+                val productInput: CreateProductInput
+                try {
+                    productInput = call.receive<CreateProductInput>()
+                } catch (e: Throwable) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        "${e::class} - Invalid request payload: ${e.message}, ${e.printStackTrace()}"
+                    )
+                    return@post
+                }
+
+                val product = productInput.toProduct()
+                val event = ProductCreated.fromModel(product)
+
+                publishToKafka(Topic.PRODUCT, product.id, event)
+
+                call.respondText("OK", status = HttpStatusCode.Created)
             }
-
-            val product = productInput.toProduct()
-            val event = ProductCreated.fromModel(product)
-
-            publishToKafka("product", product.id, event)
-
-            call.respondText("OK", status = HttpStatusCode.Created)
         }
 
         // test endpoint
         post("/send") {
             val productId = call.receiveText()
             val event = ProductAddedToCart(ProductId(productId), 10)
-            publishToKafka("product", event.productId.value, event)
+            publishToKafka(Topic.PRODUCT, event.productId.value, event)
             call.respondText("Message sent", status = HttpStatusCode.OK)
         }
     }

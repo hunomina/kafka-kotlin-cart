@@ -4,6 +4,8 @@ infra/start:
 infra/stop:
 	docker compose --file .docker/docker-compose.yml down
 
+infra/restart: infra/stop infra/start
+
 kafka/read-product-topic:
 	docker compose --file .docker/docker-compose.yml exec -it kafka \
  	/opt/kafka/bin/kafka-console-consumer.sh \

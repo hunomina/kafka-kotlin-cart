@@ -1,17 +1,12 @@
 import com.example.common.events.Event
+import com.example.common.serde.json
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.Serializer
 
 class EventSerde : Serdes.WrapperSerde<Event> {
     constructor() : super(EventSerializer(), EventDeserializer())
-}
-
-private val json = Json(Json.Default) {
-    classDiscriminator = "type"   // JSON field to decide which subclass to use
-    ignoreUnknownKeys = true      // ignore unexpected fields
 }
 
 class EventSerializer : Serializer<Event> {

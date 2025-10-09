@@ -12,16 +12,5 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Hello World!")
         }
-
-        //get("/products") {
-        //    call.respond(
-        //        listOf(
-        //            Product("Pineapple"),
-        //            Product("Strawberry"),
-        //            Product("EggPlant"),
-        //        )
-        //    )
-        //}
-
     }
 }

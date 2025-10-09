@@ -37,7 +37,7 @@ class MessageConsumer(
                     records.forEach { record -> onMessage(record) }
                 }
             } catch (e: Exception) {
-                println("Consumer error: ${e.message}")
+                println("Consumer error: ${e.stackTraceToString()}")
             } finally {
                 consumer.close()
             }

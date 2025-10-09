@@ -23,9 +23,9 @@ val ConsumerKey = AttributeKey<MessageConsumer>("MessageConsumer")
 val ProductCreatedEventDefinition = EventDefinition<ProductCreated>()
 val ProductAddedToCartEventDefinition = EventDefinition<ProductAddedToCart>()
 
-val eventDefinitionMap = mapOf<KClass<*>, EventDefinition<Event>>(
-    ProductCreated::class to ProductCreatedEventDefinition as EventDefinition<Event>,
-    ProductAddedToCart::class to ProductAddedToCartEventDefinition as EventDefinition<Event>
+val eventDefinitionMap: Map<KClass<out Event>, EventDefinition<out Event>> = mapOf(
+    ProductCreated::class to ProductCreatedEventDefinition,
+    ProductAddedToCart::class to ProductAddedToCartEventDefinition
 )
 
 val KafkaPlugin = createApplicationPlugin(name = "KafkaPlugin") {
@@ -47,7 +47,7 @@ val KafkaPlugin = createApplicationPlugin(name = "KafkaPlugin") {
             val event = json.decodeFromString<Event>(record.value())
             val eventDefinition = eventDefinitionMap[event::class] ?: throw Exception("Event not supported")
 
-            application.monitor.raise(eventDefinition, event)
+            application.monitor.raise(eventDefinition as EventDefinition<Event>, event)
         }
     }
 
